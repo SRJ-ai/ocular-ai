@@ -25,7 +25,7 @@ tf.serialization.registerClass(CustomScaleLayer);
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const MODEL_PATH = './model/model.json';
+const MODEL_PATH = './model/model.json?v=6';
 
 const CLASSES = [
   { key: 'cataract',              label: 'Cataract',               short: 'Cataract' },
@@ -84,7 +84,7 @@ async function loadModel() {
   } catch (err) {
     console.error('[OcularAI] Model failed to load:', err);
     setModelStatus('error');
-    showError('Load error: ' + (err.message || String(err)));
+    showError('TF.js ' + tf.version.tfjs + ' error: ' + (err.message || String(err)));
   }
 }
 
