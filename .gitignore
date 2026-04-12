@@ -1,0 +1,23 @@
+# Large model files (not needed for website)
+model/*.keras
+model/*.h5
+
+# Dataset (large, not needed for website)
+dataset/
+
+# Jupyter notebooks
+*.ipynb
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+.codegraph/
+.claude/

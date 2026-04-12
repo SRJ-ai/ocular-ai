@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OcularAI — Eye Disease Classifier</title>
+  <meta name="description" content="AI-powered retinal image classifier detecting Cataract, Diabetic Retinopathy, Glaucoma, and Normal eyes using InceptionResNetV2." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500;600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Noise overlay -->
+  <div class="noise"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-brand">
+      <span class="nav-eye">
+        <svg viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 2C10 2 2 12 2 12C2 12 10 22 20 22C30 22 38 12 38 12C38 12 30 2 20 2Z" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="20" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="20" cy="12" r="2" fill="currentColor"/>
+        </svg>
+      </span>
+      <span class="nav-title">OcularAI</span>
+    </div>
+    <div class="nav-meta">
+      <span class="nav-tag">InceptionResNetV2</span>
+      <span class="nav-tag">4 Classes</span>
+      <span class="nav-tag nav-tag--status" id="model-status-tag">Loading model…</span>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="hero-ring hero-ring--1"></div>
+      <div class="hero-ring hero-ring--2"></div>
+      <div class="hero-ring hero-ring--3"></div>
+      <div class="scanline"></div>
+    </div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Retinal Image Analysis</p>
+      <h1 class="hero-title">
+        See What Others<br />
+        <em>Cannot See</em>
+      </h1>
+      <p class="hero-desc">
+        Drop a retinal fundus image and our deep learning model — trained on 4,217 clinical images — will classify it across four ocular conditions with high precision.
+      </p>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num">4,217</span>
+          <span class="stat-label">Training Images</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">99%</span>
+          <span class="stat-label">DR Precision</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">4</span>
+          <span class="stat-label">Disease Classes</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-iris" aria-hidden="true">
+      <div class="iris-container">
+        <div class="iris-ring iris-ring--outer"></div>
+        <div class="iris-ring iris-ring--mid"></div>
+        <div class="iris-ring iris-ring--inner"></div>
+        <div class="iris-pupil">
+          <div class="iris-pupil-core"></div>
+        </div>
+        <div class="iris-ray iris-ray--1"></div>
+        <div class="iris-ray iris-ray--2"></div>
+        <div class="iris-ray iris-ray--3"></div>
+        <div class="iris-ray iris-ray--4"></div>
+        <div class="iris-ray iris-ray--5"></div>
+        <div class="iris-ray iris-ray--6"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Classes Section -->
+  <section class="classes" id="classes">
+    <div class="section-header">
+      <span class="section-label">01 — Condition Classes</span>
+      <h2 class="section-title">What the Model Detects</h2>
+      <p class="section-desc">Each class represents a distinct ocular pathology identifiable from retinal fundus photography.</p>
+    </div>
+
+    <div class="classes-grid">
+
+      <article class="class-card" data-class="cataract">
+        <div class="class-card-accent"></div>
+        <div class="class-images">
+          <div class="class-img-stack">
+            <img src="samples/cataract/1.jpg" alt="Cataract fundus image 1" loading="lazy" />
+            <img src="samples/cataract/2.jpg" alt="Cataract fundus image 2" loading="lazy" />
+            <img src="samples/cataract/3.jpg" alt="Cataract fundus image 3" loading="lazy" />
+          </div>
+          <span class="class-img-count">1,038 images</span>
+        </div>
+        <div class="class-body">
+          <div class="class-index">01</div>
+          <h3 class="class-name">Cataract</h3>
+          <p class="class-desc">Clouding of the eye's natural lens causing blurred vision. Identifiable by hazy, low-contrast fundus appearance and reduced vascular sharpness.</p>
+          <div class="class-precision">
+            <span class="precision-label">Model Precision</span>
+            <div class="precision-bar">
+              <div class="precision-fill" style="--fill: 94%">
+                <span class="precision-value">94%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="class-card" data-class="diabetic_retinopathy">
+        <div class="class-card-accent"></div>
+        <div class="class-images">
+          <div class="class-img-stack">
+            <img src="samples/diabetic_retinopathy/1.jpeg" alt="Diabetic retinopathy fundus 1" loading="lazy" />
+            <img src="samples/diabetic_retinopathy/2.jpeg" alt="Diabetic retinopathy fundus 2" loading="lazy" />
+            <img src="samples/diabetic_retinopathy/3.jpeg" alt="Diabetic retinopathy fundus 3" loading="lazy" />
+          </div>
+          <span class="class-img-count">1,098 images</span>
+        </div>
+        <div class="class-body">
+          <div class="class-index">02</div>
+          <h3 class="class-name">Diabetic Retinopathy</h3>
+          <p class="class-desc">Vascular damage from diabetes causing microaneurysms, hemorrhages, and exudates. Highest precision class — distinctive vascular lesion patterns.</p>
+          <div class="class-precision">
+            <span class="precision-label">Model Precision</span>
+            <div class="precision-bar">
+              <div class="precision-fill" style="--fill: 99%">
+                <span class="precision-value">99%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="class-card" data-class="glaucoma">
+        <div class="class-card-accent"></div>
+        <div class="class-images">
+          <div class="class-img-stack">
+            <img src="samples/glaucoma/1.jpg" alt="Glaucoma fundus image 1" loading="lazy" />
+            <img src="samples/glaucoma/2.jpg" alt="Glaucoma fundus image 2" loading="lazy" />
+            <img src="samples/glaucoma/3.jpg" alt="Glaucoma fundus image 3" loading="lazy" />
+          </div>
+          <span class="class-img-count">1,007 images</span>
+        </div>
+        <div class="class-body">
+          <div class="class-index">03</div>
+          <h3 class="class-name">Glaucoma</h3>
+          <p class="class-desc">Optic nerve damage from elevated intraocular pressure. Characterized by increased cup-to-disc ratio and optic nerve pallor in fundus images.</p>
+          <div class="class-precision">
+            <span class="precision-label">Model Precision</span>
+            <div class="precision-bar">
+              <div class="precision-fill" style="--fill: 92%">
+                <span class="precision-value">92%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="class-card" data-class="normal">
+        <div class="class-card-accent"></div>
+        <div class="class-images">
+          <div class="class-img-stack">
+            <img src="samples/normal/1.jpg" alt="Normal fundus image 1" loading="lazy" />
+            <img src="samples/normal/2.jpg" alt="Normal fundus image 2" loading="lazy" />
+            <img src="samples/normal/3.jpg" alt="Normal fundus image 3" loading="lazy" />
+          </div>
+          <span class="class-img-count">1,074 images</span>
+        </div>
+        <div class="class-body">
+          <div class="class-index">04</div>
+          <h3 class="class-name">Normal</h3>
+          <p class="class-desc">Healthy retina with clear optic disc, uniform vascular pattern, and no lesions. Baseline reference class for pathological comparison.</p>
+          <div class="class-precision">
+            <span class="precision-label">Model Precision</span>
+            <div class="precision-bar">
+              <div class="precision-fill" style="--fill: 89%">
+                <span class="precision-value">89%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- Classifier Section -->
+  <section class="classifier" id="classify">
+    <div class="section-header">
+      <span class="section-label">02 — Inference Engine</span>
+      <h2 class="section-title">Run Classification</h2>
+      <p class="section-desc">Upload or drag a retinal fundus image to receive an AI-powered diagnosis prediction.</p>
+    </div>
+
+    <div class="classifier-layout">
+
+      <!-- Drop Zone -->
+      <div class="dropzone-wrapper">
+        <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Drop retinal image here or click to upload">
+          <div class="dropzone-scanner">
+            <div class="scanner-ring scanner-ring--1"></div>
+            <div class="scanner-ring scanner-ring--2"></div>
+            <div class="scanner-ring scanner-ring--3"></div>
+            <div class="scanner-beam"></div>
+          </div>
+          <div class="dropzone-content" id="dropzone-idle">
+            <div class="dropzone-icon">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
+                <circle cx="32" cy="32" r="8" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="32" cy="32" r="3" fill="currentColor"/>
+                <line x1="32" y1="4" x2="32" y2="12" stroke="currentColor" stroke-width="1.5"/>
+                <line x1="32" y1="52" x2="32" y2="60" stroke="currentColor" stroke-width="1.5"/>
+                <line x1="4" y1="32" x2="12" y2="32" stroke="currentColor" stroke-width="1.5"/>
+                <line x1="52" y1="32" x2="60" y2="32" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <p class="dropzone-primary">Drop retinal image here</p>
+            <p class="dropzone-secondary">or <button class="dropzone-browse" id="browse-btn">browse file</button></p>
+            <p class="dropzone-formats">JPG · PNG · JPEG · BMP · WEBP</p>
+          </div>
+          <div class="dropzone-preview" id="dropzone-preview" hidden>
+            <img id="preview-img" alt="Uploaded retinal image" />
+            <button class="dropzone-clear" id="clear-btn" aria-label="Remove image">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2"/></svg>
+            </button>
+          </div>
+          <div class="dropzone-analyzing" id="dropzone-analyzing" hidden>
+            <div class="analyzing-ring"></div>
+            <p class="analyzing-text">Analyzing retinal image…</p>
+          </div>
+          <input type="file" id="file-input" accept="image/*" hidden />
+        </div>
+        <p class="dropzone-note">For accurate results, use standard retinal fundus photographs. This tool is for educational purposes only.</p>
+      </div>
+
+      <!-- Results Panel -->
+      <div class="results-panel" id="results-panel">
+        <div class="results-idle" id="results-idle">
+          <div class="results-idle-icon">
+            <svg viewBox="0 0 48 48" fill="none">
+              <rect x="8" y="8" width="32" height="32" rx="4" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/>
+              <path d="M20 24l4 4 8-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p>Upload an image<br/>to see results</p>
+        </div>
+
+        <div class="results-output" id="results-output" hidden>
+          <div class="results-header">
+            <span class="results-label">Analysis Complete</span>
+            <div class="results-timestamp" id="results-timestamp"></div>
+          </div>
+
+          <div class="prediction-primary" id="prediction-primary">
+            <span class="pred-prefix">Predicted:</span>
+            <span class="pred-name" id="pred-name">—</span>
+            <span class="pred-confidence" id="pred-confidence">—</span>
+          </div>
+
+          <div class="confidence-bars" id="confidence-bars">
+            <!-- Generated by JS -->
+          </div>
+
+          <div class="results-disclaimer">
+            <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1"/><path d="M8 7v4M8 5v1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            <span>Not a medical diagnosis. Consult a qualified ophthalmologist.</span>
+          </div>
+        </div>
+
+        <div class="results-error" id="results-error" hidden>
+          <div class="error-icon">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v4M12 16v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <p id="error-message">Model not loaded yet.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="nav-eye" aria-hidden="true">
+          <svg viewBox="0 0 40 24" fill="none"><path d="M20 2C10 2 2 12 2 12C2 12 10 22 20 22C30 22 38 12 38 12C38 12 30 2 20 2Z" stroke="currentColor" stroke-width="1.5"/><circle cx="20" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/><circle cx="20" cy="12" r="2" fill="currentColor"/></svg>
+        </span>
+        <span>OcularAI</span>
+      </div>
+      <div class="footer-meta">
+        <span>InceptionResNetV2 · TensorFlow.js</span>
+        <span>Educational use only</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
