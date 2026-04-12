@@ -84,7 +84,7 @@ async function loadModel() {
   } catch (err) {
     console.error('[OcularAI] Model failed to load:', err);
     setModelStatus('error');
-    showError('Model files not found. Run convert_model.py first, then re-deploy.');
+    showError('Load error: ' + (err.message || String(err)));
   }
 }
 
