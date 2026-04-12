@@ -5,6 +5,24 @@
 
 'use strict';
 
+// ─── Custom TF.js Layers ──────────────────────────────────────────────────────
+// InceptionResNetV2 uses CustomScaleLayer for residual scaling: out = a + b * scale
+
+class CustomScaleLayer extends tf.layers.Layer {
+  constructor(config) {
+    super(config);
+    this.scale = config.scale != null ? config.scale : 1.0;
+  }
+  call(inputs) {
+    return tf.tidy(() => tf.add(inputs[0], tf.mul(inputs[1], this.scale)));
+  }
+  getConfig() {
+    return Object.assign(super.getConfig(), { scale: this.scale });
+  }
+  static get className() { return 'CustomScaleLayer'; }
+}
+tf.serialization.registerClass(CustomScaleLayer);
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const MODEL_PATH = './model/model.json';
