@@ -3,195 +3,151 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OcularAI — Eye Disease Classifier</title>
-  <meta name="description" content="AI-powered retinal image classifier detecting Cataract, Diabetic Retinopathy, Glaucoma, and Normal eyes using MobileNet." />
+  <title>OcularAI — Retinal Fundus Classifier</title>
+  <meta name="description" content="AI-powered retinal image classifier for cataract, diabetic retinopathy, glaucoma, and normal classification." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500;600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=8" />
 </head>
 <body>
 
-  <!-- Noise overlay -->
-  <div class="noise"></div>
-
-  <!-- Navigation -->
-  <nav class="nav">
+<nav class="nav">
+  <div class="nav-inner">
     <div class="nav-brand">
-      <span class="nav-eye">
-        <svg viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20 2C10 2 2 12 2 12C2 12 10 22 20 22C30 22 38 12 38 12C38 12 30 2 20 2Z" stroke="currentColor" stroke-width="1.5"/>
-          <circle cx="20" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/>
-          <circle cx="20" cy="12" r="2" fill="currentColor"/>
-        </svg>
-      </span>
-      <span class="nav-title">OcularAI</span>
+      <svg class="nav-eye" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="12" stroke="currentColor" stroke-width="1.2" opacity="0.4"/>
+        <circle cx="16" cy="16" r="7"  stroke="currentColor" stroke-width="1.2" opacity="0.65"/>
+        <circle cx="16" cy="16" r="3.5" fill="currentColor"/>
+        <circle cx="14.5" cy="14.5" r="1" fill="white" opacity="0.6"/>
+      </svg>
+      <span class="nav-logo">OcularAI</span>
     </div>
-    <div class="nav-meta">
-      <span class="nav-tag">MobileNet</span>
-      <span class="nav-tag">4 Classes</span>
-      <span class="nav-tag nav-tag--status" id="model-status-tag">Loading model…</span>
+    <div class="nav-right">
+      <span class="nav-pill">MobileNet</span>
+      <span class="nav-pill">4 Classes</span>
+      <span class="nav-status" id="model-status-tag">Initializing</span>
     </div>
-  </nav>
+  </div>
+</nav>
 
-  <!-- Hero Section -->
+<main>
+
+  <!-- ── Hero ───────────────────────────────────────── -->
   <section class="hero">
-    <div class="hero-bg">
-      <div class="hero-ring hero-ring--1"></div>
-      <div class="hero-ring hero-ring--2"></div>
-      <div class="hero-ring hero-ring--3"></div>
-      <div class="scanline"></div>
-    </div>
-    <div class="hero-content">
-      <p class="hero-eyebrow">Retinal Image Analysis</p>
-      <h1 class="hero-title">
-        See What Others<br />
-        <em>Cannot See</em>
-      </h1>
-      <p class="hero-desc">
-        Drop a retinal fundus image and our deep learning model — trained on 4,217 clinical images — will classify it across four ocular conditions with high precision.
-      </p>
-      <div class="hero-stats">
-        <div class="stat">
-          <span class="stat-num">4,217</span>
-          <span class="stat-label">Training Images</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat">
-          <span class="stat-num">99%</span>
-          <span class="stat-label">DR Precision</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat">
-          <span class="stat-num">4</span>
-          <span class="stat-label">Disease Classes</span>
-        </div>
+    <div class="hero-inner">
+      <div class="hero-content">
+        <p class="hero-eyebrow">Retinal Image Analysis System · v2.0</p>
+        <h1 class="hero-title">Fundus Disease<br><em>Classification</em></h1>
+        <p class="hero-body">MobileNet architecture trained on 4,217 clinical fundus photographs. Real-time classification across four ocular pathologies directly in the browser.</p>
       </div>
-    </div>
-    <div class="hero-iris" aria-hidden="true">
-      <div class="iris-container">
-        <div class="iris-ring iris-ring--outer"></div>
-        <div class="iris-ring iris-ring--mid"></div>
-        <div class="iris-ring iris-ring--inner"></div>
-        <div class="iris-pupil">
-          <div class="iris-pupil-core"></div>
+      <div class="hero-metrics">
+        <div class="metric">
+          <span class="metric-val">4,217</span>
+          <span class="metric-key">Training Images</span>
         </div>
-        <div class="iris-ray iris-ray--1"></div>
-        <div class="iris-ray iris-ray--2"></div>
-        <div class="iris-ray iris-ray--3"></div>
-        <div class="iris-ray iris-ray--4"></div>
-        <div class="iris-ray iris-ray--5"></div>
-        <div class="iris-ray iris-ray--6"></div>
+        <div class="metric-sep"></div>
+        <div class="metric">
+          <span class="metric-val">99%</span>
+          <span class="metric-key">DR Precision</span>
+        </div>
+        <div class="metric-sep"></div>
+        <div class="metric">
+          <span class="metric-val">224px</span>
+          <span class="metric-key">Input Size</span>
+        </div>
+        <div class="metric-sep"></div>
+        <div class="metric">
+          <span class="metric-val">4</span>
+          <span class="metric-key">Pathology Classes</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Classes Section -->
-  <section class="classes" id="classes">
-    <div class="section-header">
-      <span class="section-label">01 — Condition Classes</span>
-      <h2 class="section-title">What the Model Detects</h2>
-      <p class="section-desc">Each class represents a distinct ocular pathology identifiable from retinal fundus photography.</p>
+  <!-- ── Condition Classes ───────────────────────────── -->
+  <section class="conditions">
+    <div class="section-header-row">
+      <div>
+        <p class="section-eyebrow">01 — CONDITION CLASSES</p>
+        <h2 class="section-title">Detectable Pathologies</h2>
+      </div>
     </div>
 
-    <div class="classes-grid">
+    <div class="conditions-grid">
 
-      <article class="class-card" data-class="cataract">
-        <div class="class-card-accent"></div>
-        <div class="class-images">
+      <article class="cond-card">
+        <div class="cond-img">
           <div class="class-img-stack">
-            <img src="samples/cataract/1.jpg" alt="Cataract fundus image 1" loading="lazy" />
-            <img src="samples/cataract/2.jpg" alt="Cataract fundus image 2" loading="lazy" />
-            <img src="samples/cataract/3.jpg" alt="Cataract fundus image 3" loading="lazy" />
+            <img src="samples/cataract/1.jpg"     alt="Cataract fundus" class="active" />
+            <img src="samples/cataract/2.jpg"     alt="Cataract fundus" />
+            <img src="samples/cataract/3.jpg"     alt="Cataract fundus" />
           </div>
-          <span class="class-img-count">1,038 images</span>
+          <span class="cond-index-badge">01</span>
         </div>
-        <div class="class-body">
-          <div class="class-index">01</div>
-          <h3 class="class-name">Cataract</h3>
-          <p class="class-desc">Clouding of the eye's natural lens causing blurred vision. Identifiable by hazy, low-contrast fundus appearance and reduced vascular sharpness.</p>
-          <div class="class-precision">
-            <span class="precision-label">Model Precision</span>
-            <div class="precision-bar">
-              <div class="precision-fill" style="--fill: 94%">
-                <span class="precision-value">94%</span>
-              </div>
-            </div>
+        <div class="cond-body">
+          <h3 class="cond-name">Cataract</h3>
+          <p class="cond-desc">Lens opacity causing reduced fundus clarity and attenuated vascular detail.</p>
+          <div class="cond-footer">
+            <span class="cond-count">1,038 images</span>
+            <span class="cond-precision">94% precision</span>
           </div>
         </div>
       </article>
 
-      <article class="class-card" data-class="diabetic_retinopathy">
-        <div class="class-card-accent"></div>
-        <div class="class-images">
+      <article class="cond-card highlight">
+        <div class="cond-img">
           <div class="class-img-stack">
-            <img src="samples/diabetic_retinopathy/1.jpeg" alt="Diabetic retinopathy fundus 1" loading="lazy" />
-            <img src="samples/diabetic_retinopathy/2.jpeg" alt="Diabetic retinopathy fundus 2" loading="lazy" />
-            <img src="samples/diabetic_retinopathy/3.jpeg" alt="Diabetic retinopathy fundus 3" loading="lazy" />
+            <img src="samples/diabetic_retinopathy/1.jpeg" alt="DR fundus" class="active" />
+            <img src="samples/diabetic_retinopathy/2.jpeg" alt="DR fundus" />
+            <img src="samples/diabetic_retinopathy/3.jpeg" alt="DR fundus" />
           </div>
-          <span class="class-img-count">1,098 images</span>
+          <span class="cond-index-badge">02</span>
         </div>
-        <div class="class-body">
-          <div class="class-index">02</div>
-          <h3 class="class-name">Diabetic Retinopathy</h3>
-          <p class="class-desc">Vascular damage from diabetes causing microaneurysms, hemorrhages, and exudates. Highest precision class — distinctive vascular lesion patterns.</p>
-          <div class="class-precision">
-            <span class="precision-label">Model Precision</span>
-            <div class="precision-bar">
-              <div class="precision-fill" style="--fill: 99%">
-                <span class="precision-value">99%</span>
-              </div>
-            </div>
+        <div class="cond-body">
+          <h3 class="cond-name">Diabetic Retinopathy</h3>
+          <p class="cond-desc">Microvascular damage presenting with microaneurysms, hemorrhages and exudates.</p>
+          <div class="cond-footer">
+            <span class="cond-count">1,098 images</span>
+            <span class="cond-precision accent">99% precision</span>
           </div>
         </div>
       </article>
 
-      <article class="class-card" data-class="glaucoma">
-        <div class="class-card-accent"></div>
-        <div class="class-images">
+      <article class="cond-card">
+        <div class="cond-img">
           <div class="class-img-stack">
-            <img src="samples/glaucoma/1.jpg" alt="Glaucoma fundus image 1" loading="lazy" />
-            <img src="samples/glaucoma/2.jpg" alt="Glaucoma fundus image 2" loading="lazy" />
-            <img src="samples/glaucoma/3.jpg" alt="Glaucoma fundus image 3" loading="lazy" />
+            <img src="samples/glaucoma/1.jpg" alt="Glaucoma fundus" class="active" />
+            <img src="samples/glaucoma/2.jpg" alt="Glaucoma fundus" />
+            <img src="samples/glaucoma/3.jpg" alt="Glaucoma fundus" />
           </div>
-          <span class="class-img-count">1,007 images</span>
+          <span class="cond-index-badge">03</span>
         </div>
-        <div class="class-body">
-          <div class="class-index">03</div>
-          <h3 class="class-name">Glaucoma</h3>
-          <p class="class-desc">Optic nerve damage from elevated intraocular pressure. Characterized by increased cup-to-disc ratio and optic nerve pallor in fundus images.</p>
-          <div class="class-precision">
-            <span class="precision-label">Model Precision</span>
-            <div class="precision-bar">
-              <div class="precision-fill" style="--fill: 92%">
-                <span class="precision-value">92%</span>
-              </div>
-            </div>
+        <div class="cond-body">
+          <h3 class="cond-name">Glaucoma</h3>
+          <p class="cond-desc">Optic neuropathy with enlarged cup-to-disc ratio and progressive nerve fibre loss.</p>
+          <div class="cond-footer">
+            <span class="cond-count">1,007 images</span>
+            <span class="cond-precision">92% precision</span>
           </div>
         </div>
       </article>
 
-      <article class="class-card" data-class="normal">
-        <div class="class-card-accent"></div>
-        <div class="class-images">
+      <article class="cond-card">
+        <div class="cond-img">
           <div class="class-img-stack">
-            <img src="samples/normal/1.jpg" alt="Normal fundus image 1" loading="lazy" />
-            <img src="samples/normal/2.jpg" alt="Normal fundus image 2" loading="lazy" />
-            <img src="samples/normal/3.jpg" alt="Normal fundus image 3" loading="lazy" />
+            <img src="samples/normal/1.jpg" alt="Normal fundus" class="active" />
+            <img src="samples/normal/2.jpg" alt="Normal fundus" />
+            <img src="samples/normal/3.jpg" alt="Normal fundus" />
           </div>
-          <span class="class-img-count">1,074 images</span>
+          <span class="cond-index-badge">04</span>
         </div>
-        <div class="class-body">
-          <div class="class-index">04</div>
-          <h3 class="class-name">Normal</h3>
-          <p class="class-desc">Healthy retina with clear optic disc, uniform vascular pattern, and no lesions. Baseline reference class for pathological comparison.</p>
-          <div class="class-precision">
-            <span class="precision-label">Model Precision</span>
-            <div class="precision-bar">
-              <div class="precision-fill" style="--fill: 89%">
-                <span class="precision-value">89%</span>
-              </div>
-            </div>
+        <div class="cond-body">
+          <h3 class="cond-name">Normal</h3>
+          <p class="cond-desc">Healthy retina with clear optic disc and regular vascular architecture.</p>
+          <div class="cond-footer">
+            <span class="cond-count">1,074 images</span>
+            <span class="cond-precision">89% precision</span>
           </div>
         </div>
       </article>
@@ -199,118 +155,163 @@
     </div>
   </section>
 
-  <!-- Classifier Section -->
-  <section class="classifier" id="classify">
-    <div class="section-header">
-      <span class="section-label">02 — Inference Engine</span>
-      <h2 class="section-title">Run Classification</h2>
-      <p class="section-desc">Upload or drag a retinal fundus image to receive an AI-powered diagnosis prediction.</p>
+  <!-- ── Classifier Workspace ───────────────────────── -->
+  <section class="workspace-section">
+    <div class="section-header-row">
+      <div>
+        <p class="section-eyebrow">02 — INFERENCE ENGINE</p>
+        <h2 class="section-title">Run Classification</h2>
+      </div>
     </div>
 
-    <div class="classifier-layout">
+    <div class="workspace">
 
-      <!-- Drop Zone -->
-      <div class="dropzone-wrapper">
-        <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Drop retinal image here or click to upload">
-          <div class="dropzone-scanner">
-            <div class="scanner-ring scanner-ring--1"></div>
-            <div class="scanner-ring scanner-ring--2"></div>
-            <div class="scanner-ring scanner-ring--3"></div>
-            <div class="scanner-beam"></div>
-          </div>
-          <div class="dropzone-content" id="dropzone-idle">
-            <div class="dropzone-icon">
-              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
-                <circle cx="32" cy="32" r="8" stroke="currentColor" stroke-width="1.5"/>
-                <circle cx="32" cy="32" r="3" fill="currentColor"/>
-                <line x1="32" y1="4" x2="32" y2="12" stroke="currentColor" stroke-width="1.5"/>
-                <line x1="32" y1="52" x2="32" y2="60" stroke="currentColor" stroke-width="1.5"/>
-                <line x1="4" y1="32" x2="12" y2="32" stroke="currentColor" stroke-width="1.5"/>
-                <line x1="52" y1="32" x2="60" y2="32" stroke="currentColor" stroke-width="1.5"/>
+      <!-- Left: Upload Panel -->
+      <div class="upload-panel">
+        <div class="panel-topbar">
+          <span class="panel-label">PATIENT IMAGE</span>
+          <button class="btn-clear" id="clear-btn" hidden>
+            <svg viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Clear
+          </button>
+        </div>
+
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Drop or click to upload a retinal fundus image">
+
+          <div id="dropzone-idle" class="dz-state">
+            <div class="dz-icon">
+              <svg viewBox="0 0 96 96" fill="none">
+                <circle cx="48" cy="48" r="38" stroke="currentColor" stroke-width="0.75" opacity="0.15"/>
+                <circle cx="48" cy="48" r="26" stroke="currentColor" stroke-width="0.75" opacity="0.25"/>
+                <circle cx="48" cy="48" r="15" stroke="currentColor" stroke-width="1"    opacity="0.45"/>
+                <circle cx="48" cy="48" r="6"  stroke="currentColor" stroke-width="1.5" opacity="0.75"/>
+                <circle cx="48" cy="48" r="2.5" fill="currentColor"  opacity="0.9"/>
+                <circle cx="44.5" cy="44.5" r="1.2" fill="white"    opacity="0.55"/>
+                <line x1="48" y1="5"  x2="48" y2="12"  stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.25"/>
+                <line x1="48" y1="84" x2="48" y2="91"  stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.25"/>
+                <line x1="5"  y1="48" x2="12" y2="48"  stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.25"/>
+                <line x1="84" y1="48" x2="91" y2="48"  stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.25"/>
               </svg>
             </div>
-            <p class="dropzone-primary">Drop retinal image here</p>
-            <p class="dropzone-secondary">or <button class="dropzone-browse" id="browse-btn">browse file</button></p>
-            <p class="dropzone-formats">JPG · PNG · JPEG · BMP · WEBP</p>
+            <p class="dz-primary">Drop retinal fundus image here</p>
+            <p class="dz-secondary">or <button class="dz-browse" id="browse-btn">browse file</button></p>
+            <p class="dz-formats">Accepts JPG · PNG · BMP · WEBP</p>
           </div>
-          <div class="dropzone-preview" id="dropzone-preview" hidden>
-            <img id="preview-img" alt="Uploaded retinal image" />
-            <button class="dropzone-clear" id="clear-btn" aria-label="Remove image">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2"/></svg>
-            </button>
+
+          <div id="dropzone-preview" class="dz-state" hidden>
+            <img id="preview-img" alt="Uploaded fundus image" />
           </div>
-          <div class="dropzone-analyzing" id="dropzone-analyzing" hidden>
-            <div class="analyzing-ring"></div>
-            <p class="analyzing-text">Analyzing retinal image…</p>
+
+          <div id="dropzone-analyzing" class="dz-state dz-analyzing" hidden>
+            <div class="scan-spinner">
+              <div class="scan-ring r1"></div>
+              <div class="scan-ring r2"></div>
+              <div class="scan-ring r3"></div>
+              <span class="scan-label">Analyzing</span>
+            </div>
           </div>
-          <input type="file" id="file-input" accept="image/*" hidden />
+
         </div>
-        <p class="dropzone-note">For accurate results, use standard retinal fundus photographs. This tool is for educational purposes only.</p>
+
+        <input type="file" id="file-input" accept="image/*" hidden />
+        <p class="upload-note">
+          <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1"/><path d="M7 4.5v3M7 9.5h.01" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Use standard retinal fundus photographs. For educational use only.
+        </p>
       </div>
 
-      <!-- Results Panel -->
-      <div class="results-panel" id="results-panel">
-        <div class="results-idle" id="results-idle">
-          <div class="results-idle-icon">
-            <svg viewBox="0 0 48 48" fill="none">
-              <rect x="8" y="8" width="32" height="32" rx="4" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/>
-              <path d="M20 24l4 4 8-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Right: Diagnostic Report -->
+      <div class="report-panel" id="results-panel">
+
+        <div id="results-idle" class="report-await">
+          <svg class="await-icon" viewBox="0 0 56 56" fill="none">
+            <rect x="10" y="6" width="36" height="44" rx="3" stroke="currentColor" stroke-width="1.2" opacity="0.25"/>
+            <path d="M18 18h20M18 24h20M18 30h14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.25"/>
+            <circle cx="42" cy="42" r="10" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.3"/>
+            <path d="M38.5 42h7M42 38.5v7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+          </svg>
+          <p class="await-title">Awaiting Image</p>
+          <p class="await-sub">Upload a retinal fundus photograph to generate a diagnostic report</p>
+        </div>
+
+        <div id="results-output" hidden>
+
+          <div class="rpt-head">
+            <div class="rpt-title-row">
+              <span class="rpt-title">DIAGNOSTIC REPORT</span>
+              <span class="rpt-id">RID · <span id="results-timestamp">—</span></span>
+            </div>
+            <div class="rpt-meta">
+              <span>Model: MobileNet v2</span>
+              <span>·</span>
+              <span>Training: 4,217 images</span>
+              <span>·</span>
+              <span class="rpt-status-ok">COMPLETE</span>
+            </div>
+          </div>
+
+          <div class="rpt-rule"></div>
+
+          <div class="rpt-block">
+            <p class="rpt-section-label">IMPRESSION</p>
+            <div class="impression">
+              <span class="imp-name" id="pred-name">—</span>
+              <div class="imp-conf-wrap">
+                <span class="imp-conf" id="pred-confidence">—</span>
+                <span class="imp-conf-label">confidence</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rpt-rule"></div>
+
+          <div class="rpt-block">
+            <p class="rpt-section-label">DIFFERENTIAL DIAGNOSIS</p>
+            <div class="diff-table" id="confidence-bars"></div>
+          </div>
+
+          <div class="rpt-rule"></div>
+
+          <div class="rpt-block rpt-disclaimer">
+            <svg viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2"/>
+              <path d="M8 5v3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <circle cx="8" cy="11.5" r="0.8" fill="currentColor"/>
             </svg>
+            <p>This output is <strong>not a clinical diagnosis</strong>. For research and educational purposes only. Consult a qualified ophthalmologist for medical decisions.</p>
           </div>
-          <p>Upload an image<br/>to see results</p>
+
         </div>
 
-        <div class="results-output" id="results-output" hidden>
-          <div class="results-header">
-            <span class="results-label">Analysis Complete</span>
-            <div class="results-timestamp" id="results-timestamp"></div>
-          </div>
-
-          <div class="prediction-primary" id="prediction-primary">
-            <span class="pred-prefix">Predicted:</span>
-            <span class="pred-name" id="pred-name">—</span>
-            <span class="pred-confidence" id="pred-confidence">—</span>
-          </div>
-
-          <div class="confidence-bars" id="confidence-bars">
-            <!-- Generated by JS -->
-          </div>
-
-          <div class="results-disclaimer">
-            <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1"/><path d="M8 7v4M8 5v1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-            <span>Not a medical diagnosis. Consult a qualified ophthalmologist.</span>
+        <div id="results-error" hidden>
+          <div class="rpt-error">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 9v4M12 16.5h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            <p id="error-message">An error occurred.</p>
           </div>
         </div>
 
-        <div class="results-error" id="results-error" hidden>
-          <div class="error-icon">
-            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v4M12 16v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          </div>
-          <p id="error-message">Model not loaded yet.</p>
-        </div>
       </div>
-
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <span class="nav-eye" aria-hidden="true">
-          <svg viewBox="0 0 40 24" fill="none"><path d="M20 2C10 2 2 12 2 12C2 12 10 22 20 22C30 22 38 12 38 12C38 12 30 2 20 2Z" stroke="currentColor" stroke-width="1.5"/><circle cx="20" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/><circle cx="20" cy="12" r="2" fill="currentColor"/></svg>
-        </span>
-        <span>OcularAI</span>
-      </div>
-      <div class="footer-meta">
-        <span>MobileNet · TensorFlow.js</span>
-        <span>Educational use only</span>
-      </div>
-    </div>
-  </footer>
+</main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
-  <script src="js/app.js?v=7"></script>
+<footer class="footer">
+  <div class="footer-inner">
+    <span>OcularAI</span>
+    <span class="foot-sep">·</span>
+    <span>MobileNet · TensorFlow.js 4.22</span>
+    <span class="foot-sep">·</span>
+    <span>Educational use only</span>
+    <span class="foot-sep">·</span>
+    <a href="https://github.com/SRJ-ai/ocular-ai" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+<script src="js/app.js?v=8"></script>
 </body>
 </html>
