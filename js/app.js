@@ -5,27 +5,10 @@
 
 'use strict';
 
-// ─── Custom TF.js Layers ──────────────────────────────────────────────────────
-// InceptionResNetV2 uses CustomScaleLayer for residual scaling: out = a + b * scale
-
-class CustomScaleLayer extends tf.layers.Layer {
-  constructor(config) {
-    super(config);
-    this.scale = config.scale != null ? config.scale : 1.0;
-  }
-  call(inputs) {
-    return tf.tidy(() => tf.add(inputs[0], tf.mul(inputs[1], this.scale)));
-  }
-  getConfig() {
-    return Object.assign(super.getConfig(), { scale: this.scale });
-  }
-  static get className() { return 'CustomScaleLayer'; }
-}
-tf.serialization.registerClass(CustomScaleLayer);
-
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const MODEL_PATH = './model/model.json?v=6';
+// Teachable Machine MobileNet model (2.1 MB, native TF.js format)
+const MODEL_PATH = './model_tm/model.json';
 
 const CLASSES = [
   { key: 'cataract',              label: 'Cataract',               short: 'Cataract' },
@@ -105,13 +88,15 @@ function setModelStatus(state) {
 
 function preprocessImage(imgElement) {
   return tf.tidy(() => {
-    // fromPixels → float32 → resize → normalize [0,1] → add batch dim
+    // Teachable Machine expects: resize to 224x224, normalize [0,255] → [-1,1]
+    const offset = tf.scalar(127.5);
     return tf.browser
       .fromPixels(imgElement)
       .toFloat()
-      .div(tf.scalar(255.0))
       .resizeBilinear([IMG_SIZE, IMG_SIZE])
-      .expandDims(0);  // shape: [1, 299, 299, 3]
+      .sub(offset)
+      .div(offset)
+      .expandDims(0);  // shape: [1, 224, 224, 3], values in [-1, 1]
   });
 }
 
