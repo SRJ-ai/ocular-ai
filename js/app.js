@@ -19,6 +19,18 @@ const CLASSES = [
 
 const IMG_SIZE = 224; // Model trained with 224x224 input
 
+// ─── Lazy script loader ───────────────────────────────────────────────────────
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
 // ─── State ────────────────────────────────────────────────────────────────────
 
 let model = null;
@@ -330,6 +342,68 @@ document.addEventListener('DOMContentLoaded', () => {
   loadModel();
 });
 
-// Stubs — will be implemented in later tasks
+// Stub — will be implemented in Task 3
 function addToHistory() { /* stub — Task 3 */ }
-function exportPDF() { /* stub — Task 2 */ }
+
+// ─── PDF Export ───────────────────────────────────────────────────────────────
+
+async function exportPDF() {
+  const btn = document.getElementById('export-btn');
+  const originalHTML = btn.innerHTML;
+  btn.classList.add('loading');
+  btn.textContent = 'Generating…';
+
+  try {
+    await loadScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
+    await loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');
+
+    const reportEl = document.getElementById('results-output');
+    const canvas = await html2canvas(reportEl, {
+      backgroundColor: '#131924',
+      scale: 2,
+      useCORS: true,
+      logging: false,
+    });
+
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const margin = 15;
+    const contentW = pageW - margin * 2;
+
+    // Header
+    pdf.setFontSize(10);
+    pdf.setTextColor(150, 170, 190);
+    pdf.text('OcularAI — Retinal Fundus Classifier', margin, 12);
+    pdf.text('Educational use only · Not a clinical diagnosis', pageW - margin, 12, { align: 'right' });
+    pdf.setDrawColor(50, 70, 90);
+    pdf.line(margin, 15, pageW - margin, 15);
+
+    // Report image
+    const imgH = (canvas.height / canvas.width) * contentW;
+    const maxH = pageH - 30;
+    const finalH = Math.min(imgH, maxH);
+    pdf.addImage(imgData, 'PNG', margin, 20, contentW, finalH);
+
+    // Footer
+    pdf.setFontSize(8);
+    pdf.setTextColor(100, 120, 140);
+    const now = new Date();
+    pdf.text(`Generated ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, margin, pageH - 8);
+
+    const ts = now.getHours().toString().padStart(2,'0') +
+               now.getMinutes().toString().padStart(2,'0') +
+               now.getSeconds().toString().padStart(2,'0');
+    pdf.save(`OcularAI-Report-${ts}.pdf`);
+
+  } catch (err) {
+    console.error('[OcularAI] PDF export failed:', err);
+    alert('PDF export failed: ' + err.message);
+  } finally {
+    btn.classList.remove('loading');
+    btn.innerHTML = originalHTML;
+  }
+}
