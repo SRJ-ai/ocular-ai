@@ -30,7 +30,8 @@ let currentFile = null;
 const dropzone        = document.getElementById('dropzone');
 const fileInput       = document.getElementById('file-input');
 const browseBtn       = document.getElementById('browse-btn');
-const clearBtn        = document.getElementById('clear-btn');
+const nextBtn         = document.getElementById('next-btn');
+const exportBtn       = document.getElementById('export-btn');
 const dropzoneIdle    = document.getElementById('dropzone-idle');
 const dropzonePreview = document.getElementById('dropzone-preview');
 const dropzoneAnalyze = document.getElementById('dropzone-analyzing');
@@ -270,7 +271,6 @@ dropzone.addEventListener('drop', (e) => {
 
 // Click to browse
 dropzone.addEventListener('click', (e) => {
-  if (e.target === clearBtn || clearBtn.contains(e.target)) return;
   if (dropzonePreview.hidden === false) return; // don't re-open while preview shown
   fileInput.click();
 });
@@ -280,13 +280,15 @@ browseBtn.addEventListener('click', (e) => {
   fileInput.click();
 });
 
-fileInput.addEventListener('change', () => {
-  if (fileInput.files[0]) handleFile(fileInput.files[0]);
+nextBtn.addEventListener('click', () => {
+  addToHistory();   // will be implemented in Task 3; for now this is a no-op placeholder call
+  clearImage();
 });
 
-clearBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  clearImage();
+exportBtn.addEventListener('click', exportPDF);   // exportPDF will be implemented in Task 2
+
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) handleFile(fileInput.files[0]);
 });
 
 // Keyboard support
@@ -327,3 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
   startImageCycling();
   loadModel();
 });
+
+// Stubs — will be implemented in later tasks
+function addToHistory() { /* stub — Task 3 */ }
+function exportPDF() { /* stub — Task 2 */ }

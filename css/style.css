@@ -382,28 +382,6 @@ a:hover { text-decoration: underline; }
   color: var(--text-muted);
 }
 
-.btn-clear {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.06em;
-  color: var(--text-dim);
-  padding: 0.25rem 0.6rem;
-  border: 1px solid var(--border-med);
-  border-radius: 5px;
-  background: var(--surface);
-  transition: var(--tr);
-}
-
-.btn-clear svg { width: 11px; height: 11px; }
-
-.btn-clear:hover {
-  color: var(--red);
-  border-color: rgba(239,68,68,0.3);
-  background: rgba(239,68,68,0.07);
-}
 
 /* ─── Dropzone ───────────────────────────────── */
 .dropzone {
@@ -819,6 +797,57 @@ a:hover { text-decoration: underline; }
   color: var(--amber);
   font-weight: 600;
 }
+
+/* ─── Report Actions ─────────────────────────────── */
+.rpt-actions {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.btn-export {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid var(--border-med);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  transition: var(--tr);
+  cursor: pointer;
+}
+.btn-export svg { width: 14px; height: 14px; flex-shrink: 0; }
+.btn-export:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.btn-export.loading { opacity: 0.6; pointer-events: none; }
+
+.btn-next {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.25rem;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--tr);
+  flex: 1;
+  justify-content: center;
+}
+.btn-next svg { width: 14px; height: 14px; flex-shrink: 0; }
+.btn-next:hover { background: #0284c7; }
 
 /* Error state */
 #results-error {
