@@ -11,6 +11,7 @@
   --border-med:  rgba(255,255,255,0.12);
 
   --accent:      #0ea5e9;
+  --accent-dark: #0284c7;
   --accent-dim:  rgba(14,165,233,0.12);
   --accent-glow: rgba(14,165,233,0.2);
   --green:       #10b981;
@@ -847,7 +848,7 @@ a:hover { text-decoration: underline; }
   justify-content: center;
 }
 .btn-next svg { width: 14px; height: 14px; flex-shrink: 0; }
-.btn-next:hover { background: #0284c7; }
+.btn-next:hover { background: var(--accent-dark); }
 
 /* Error state */
 #results-error {
