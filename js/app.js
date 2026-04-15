@@ -51,6 +51,13 @@ const exportBtn       = document.getElementById('export-btn');
 const historyList     = document.getElementById('history-list');
 const historyEmpty    = document.getElementById('history-empty');
 const historyCount    = document.getElementById('history-count');
+const cameraBtn       = document.getElementById('camera-btn');
+const cameraModal     = document.getElementById('camera-modal');
+const cameraFeed      = document.getElementById('camera-feed');
+const cameraCanvas    = document.getElementById('camera-canvas');
+const captureBtn      = document.getElementById('capture-btn');
+const cameraCancelBtn = document.getElementById('camera-cancel-btn');
+const cameraError     = document.getElementById('camera-error');
 const dropzoneIdle    = document.getElementById('dropzone-idle');
 const dropzonePreview = document.getElementById('dropzone-preview');
 const dropzoneAnalyze = document.getElementById('dropzone-analyzing');
@@ -179,6 +186,7 @@ function showResults(probs) {
 
     const row = document.createElement('div');
     row.className = 'conf-row';
+    row.style.setProperty('--stagger', rank);
     row.innerHTML = `
       <span class="conf-label${isTop ? ' top' : ''}">${item.label}</span>
       <div class="conf-bar-track">
@@ -261,6 +269,54 @@ function clearImage() {
   fileInput.value = '';
   showState('idle');
 }
+
+// ─── Camera Capture ───────────────────────────────────────────────────────────
+
+let cameraStream = null;
+
+async function openCamera() {
+  cameraError.hidden = true;
+  captureBtn.disabled = false;
+  cameraModal.hidden = false;
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+    cameraFeed.srcObject = cameraStream;
+  } catch (err) {
+    cameraError.textContent = 'Camera not available — please use file upload. (' + err.message + ')';
+    cameraError.hidden = false;
+    captureBtn.disabled = true;
+  }
+}
+
+function closeCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+  cameraFeed.srcObject = null;
+  cameraModal.hidden = true;
+}
+
+function captureFrame() {
+  const w = cameraFeed.videoWidth  || 640;
+  const h = cameraFeed.videoHeight || 480;
+  cameraCanvas.width  = w;
+  cameraCanvas.height = h;
+  cameraCanvas.getContext('2d').drawImage(cameraFeed, 0, 0, w, h);
+  closeCamera();
+  cameraCanvas.toBlob(blob => {
+    if (blob) handleFile(new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' }));
+  }, 'image/jpeg', 0.92);
+}
+
+cameraBtn.addEventListener('click', (e) => { e.stopPropagation(); openCamera(); });
+captureBtn.addEventListener('click', captureFrame);
+cameraCancelBtn.addEventListener('click', closeCamera);
+cameraModal.addEventListener('click', (e) => {
+  if (e.target === cameraModal || e.target.classList.contains('camera-backdrop')) closeCamera();
+});
 
 // ─── Drag and Drop ────────────────────────────────────────────────────────────
 
