@@ -20,15 +20,19 @@ const CLASSES = [
 const IMG_SIZE = 224; // Model trained with 224x224 input
 
 // ─── Lazy script loader ───────────────────────────────────────────────────────
+const _scriptCache = new Map();
 function loadScript(src) {
-  return new Promise((resolve, reject) => {
+  if (_scriptCache.has(src)) return _scriptCache.get(src);
+  const p = new Promise((resolve, reject) => {
     if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
     const s = document.createElement('script');
     s.src = src;
-    s.onload = resolve;
-    s.onerror = reject;
+    s.onload  = resolve;
+    s.onerror = () => { _scriptCache.delete(src); reject(new Error(`Failed to load script: ${src}`)); };
     document.head.appendChild(s);
   });
+  _scriptCache.set(src, p);
+  return p;
 }
 
 // ─── State ────────────────────────────────────────────────────────────────────
@@ -366,6 +370,8 @@ async function exportPDF() {
     });
 
     const imgData = canvas.toDataURL('image/png');
+    canvas.width  = 0;
+    canvas.height = 0;
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
@@ -382,11 +388,19 @@ async function exportPDF() {
     pdf.setDrawColor(50, 70, 90);
     pdf.line(margin, 15, pageW - margin, 15);
 
-    // Report image
-    const imgH = (canvas.height / canvas.width) * contentW;
-    const maxH = pageH - 30;
-    const finalH = Math.min(imgH, maxH);
-    pdf.addImage(imgData, 'PNG', margin, 20, contentW, finalH);
+    // Report image — maintain aspect ratio, scale down if needed
+    const imgAspect = canvas.height / canvas.width;
+    const imgH      = imgAspect * contentW;
+    const maxH      = pageH - 30;
+
+    let finalW = contentW;
+    let finalH = imgH;
+    if (imgH > maxH) {
+      finalH = maxH;
+      finalW = maxH / imgAspect;
+    }
+
+    pdf.addImage(imgData, 'PNG', margin, 20, finalW, finalH);
 
     // Footer
     pdf.setFontSize(8);
