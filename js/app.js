@@ -48,6 +48,9 @@ const fileInput       = document.getElementById('file-input');
 const browseBtn       = document.getElementById('browse-btn');
 const nextBtn         = document.getElementById('next-btn');
 const exportBtn       = document.getElementById('export-btn');
+const historyList     = document.getElementById('history-list');
+const historyEmpty    = document.getElementById('history-empty');
+const historyCount    = document.getElementById('history-count');
 const dropzoneIdle    = document.getElementById('dropzone-idle');
 const dropzonePreview = document.getElementById('dropzone-preview');
 const dropzoneAnalyze = document.getElementById('dropzone-analyzing');
@@ -342,12 +345,79 @@ function startImageCycling() {
 
 document.addEventListener('DOMContentLoaded', () => {
   showState('idle');
+  renderHistory();
   startImageCycling();
   loadModel();
 });
 
-// Stub — will be implemented in Task 3
-function addToHistory() { /* stub — Task 3 */ }
+// ─── Scan History ─────────────────────────────────────────────────────────────
+
+const HISTORY_KEY = 'ocularai_history';
+const MAX_HISTORY = 5;
+
+function getHistory() {
+  try { return JSON.parse(sessionStorage.getItem(HISTORY_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function saveHistory(arr) {
+  sessionStorage.setItem(HISTORY_KEY, JSON.stringify(arr));
+}
+
+function addToHistory() {
+  if (resultsOutput.hidden) return;
+  const label  = predName.textContent;
+  const conf   = predConfidence.textContent;
+  const ts     = resultsTimestamp.textContent;
+  const imgSrc = previewImg.src;
+  if (!label || label === '—' || !imgSrc) return;
+
+  const scan = { label, conf, ts, imgSrc, id: Date.now() };
+  let arr = getHistory();
+  arr.unshift(scan);
+  if (arr.length > MAX_HISTORY) arr = arr.slice(0, MAX_HISTORY);
+  saveHistory(arr);
+  renderHistory();
+}
+
+function renderHistory() {
+  const arr = getHistory();
+  historyCount.textContent = `${arr.length} / ${MAX_HISTORY}`;
+  Array.from(historyList.querySelectorAll('.history-card')).forEach(el => el.remove());
+  if (arr.length === 0) {
+    historyEmpty.hidden = false;
+    return;
+  }
+  historyEmpty.hidden = true;
+  arr.forEach(scan => {
+    const card = document.createElement('div');
+    card.className = 'history-card';
+    card.innerHTML = `
+      <img class="history-thumb" src="${scan.imgSrc}" alt="${scan.label}" />
+      <div class="history-info">
+        <span class="history-label">${scan.label}</span>
+        <span class="history-meta">${scan.conf} · ${scan.ts}</span>
+      </div>
+    `;
+    card.addEventListener('click', () => restoreScan(scan));
+    historyList.appendChild(card);
+  });
+}
+
+function restoreScan(scan) {
+  previewImg.src = scan.imgSrc;
+  predName.textContent        = scan.label;
+  predConfidence.textContent  = scan.conf;
+  resultsTimestamp.textContent = scan.ts;
+  dropzoneIdle.hidden    = true;
+  dropzonePreview.hidden = false;
+  dropzoneAnalyze.hidden = true;
+  resultsIdle.hidden     = true;
+  resultsOutput.hidden   = false;
+  resultsError.hidden    = true;
+  resultsPanel.style.alignItems = 'flex-start';
+  confidenceBars.innerHTML = '<p style="color:var(--text-muted);font-size:0.75rem;padding:0.5rem 0">Restored from history</p>';
+}
 
 // ─── PDF Export ───────────────────────────────────────────────────────────────
 
