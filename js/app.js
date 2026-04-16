@@ -404,7 +404,63 @@ document.addEventListener('DOMContentLoaded', () => {
   renderHistory();
   startImageCycling();
   loadModel();
+  initCreditBanner();
+  initSampleGallery();
 });
+
+// ─── Credit Banner ────────────────────────────────────────────────────────────
+
+function initCreditBanner() {
+  const banner = document.getElementById('credit-banner');
+  const closeBtn = document.getElementById('credit-banner-close');
+  if (!banner || !closeBtn) return;
+  if (sessionStorage.getItem('banner_dismissed')) {
+    banner.hidden = true;
+    return;
+  }
+  closeBtn.addEventListener('click', () => {
+    banner.hidden = true;
+    sessionStorage.setItem('banner_dismissed', '1');
+  });
+}
+
+// ─── Sample Gallery ───────────────────────────────────────────────────────────
+
+function initSampleGallery() {
+  // Tab switching
+  document.querySelectorAll('.samples-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.samples-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.samples-panel').forEach(p => { p.hidden = true; });
+      tab.classList.add('active');
+      const panel = document.querySelector(`.samples-panel[data-class="${tab.dataset.class}"]`);
+      if (panel) panel.hidden = false;
+    });
+  });
+
+  // Click to load sample
+  document.querySelectorAll('.sample-thumb').forEach(img => {
+    img.addEventListener('click', () => loadSample(img));
+  });
+}
+
+async function loadSample(img) {
+  img.classList.add('loading');
+  try {
+    const response = await fetch(img.dataset.src);
+    const blob = await response.blob();
+    const ext = img.dataset.ext || 'jpg';
+    const mime = ext === 'jpeg' || ext === 'jpg' ? 'image/jpeg' : 'image/png';
+    const file = new File([blob], `sample.${ext}`, { type: mime });
+    handleFile(file);
+    // Scroll to workspace
+    document.querySelector('.workspace-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (err) {
+    console.error('[OcularAI] Failed to load sample:', err);
+  } finally {
+    img.classList.remove('loading');
+  }
+}
 
 // ─── Scan History ─────────────────────────────────────────────────────────────
 

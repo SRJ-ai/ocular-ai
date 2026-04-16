@@ -8,9 +8,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=10" />
+  <link rel="stylesheet" href="css/style.css?v=11" />
 </head>
 <body>
+
+<!-- Credit Banner -->
+<div class="credit-banner" id="credit-banner">
+  <div class="credit-banner-inner">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM8 5v3.5M8 10.5h.01" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    <span>Developed as an internship project under the guidance of <strong>Dr. P. Rangababu</strong>, Associate Professor — IIITDM Kurnool. For educational &amp; research purposes only.</span>
+  </div>
+  <button class="credit-banner-close" id="credit-banner-close" type="button" aria-label="Dismiss">
+    <svg viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </button>
+</div>
 
 <nav class="nav">
   <div class="nav-inner">
@@ -155,11 +166,84 @@
     </div>
   </section>
 
+  <!-- ── Sample Images ────────────────────────────────── -->
+  <section class="samples-section">
+    <div class="section-header-row">
+      <div>
+        <p class="section-eyebrow">02 — SAMPLE IMAGES</p>
+        <h2 class="section-title">Try with a Sample</h2>
+      </div>
+      <p class="samples-hint">Click any image to load it into the classifier</p>
+    </div>
+
+    <div class="samples-tabs">
+      <button class="samples-tab active" data-class="cataract" type="button">Cataract</button>
+      <button class="samples-tab" data-class="diabetic_retinopathy" type="button">Diabetic Retinopathy</button>
+      <button class="samples-tab" data-class="glaucoma" type="button">Glaucoma</button>
+      <button class="samples-tab" data-class="normal" type="button">Normal</button>
+    </div>
+
+    <div class="samples-grid" id="samples-grid">
+      <!-- Cataract (default active) -->
+      <div class="samples-panel active" data-class="cataract">
+        <img class="sample-thumb" src="samples/cataract/1.jpg"  alt="Cataract sample" data-src="samples/cataract/1.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/cataract/2.jpg"  alt="Cataract sample" data-src="samples/cataract/2.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/cataract/3.jpg"  alt="Cataract sample" data-src="samples/cataract/3.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/cataract/4.jpg"  alt="Cataract sample" data-src="samples/cataract/4.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/cataract/5.jpg"  alt="Cataract sample" data-src="samples/cataract/5.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/cataract/6.jpg"  alt="Cataract sample" data-src="samples/cataract/6.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/cataract/7.jpg"  alt="Cataract sample" data-src="samples/cataract/7.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/cataract/8.jpg"  alt="Cataract sample" data-src="samples/cataract/8.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/cataract/9.jpg"  alt="Cataract sample" data-src="samples/cataract/9.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/cataract/10.jpg" alt="Cataract sample" data-src="samples/cataract/10.jpg" data-ext="jpg" />
+      </div>
+      <!-- Diabetic Retinopathy -->
+      <div class="samples-panel" data-class="diabetic_retinopathy" hidden>
+        <img class="sample-thumb" src="samples/diabetic_retinopathy/1.jpeg"  alt="DR sample" data-src="samples/diabetic_retinopathy/1.jpeg"  data-ext="jpeg" />
+        <img class="sample-thumb" src="samples/diabetic_retinopathy/2.jpeg"  alt="DR sample" data-src="samples/diabetic_retinopathy/2.jpeg"  data-ext="jpeg" />
+        <img class="sample-thumb" src="samples/diabetic_retinopathy/3.jpeg"  alt="DR sample" data-src="samples/diabetic_retinopathy/3.jpeg"  data-ext="jpeg" />
+        <img class="sample-thumb" src="samples/diabetic_retinopathy/4.jpeg"  alt="DR sample" data-src="samples/diabetic_retinopathy/4.jpeg"  data-ext="jpeg" />
+        <img class="sample-thumb" src="samples/diabetic_retinopathy/5.jpeg"  alt="DR sample" data-src="samples/diabetic_retinopathy/5.jpeg"  data-ext="jpeg" />
+        <img class="sample-thumb" src="samples/diabetic_retinopathy/6.jpeg"  alt="DR sample" data-src="samples/diabetic_retinopathy/6.jpeg"  data-ext="jpeg" />
+        <img class="sample-thumb" src="samples/diabetic_retinopathy/7.jpeg"  alt="DR sample" data-src="samples/diabetic_retinopathy/7.jpeg"  data-ext="jpeg" />
+        <img class="sample-thumb" src="samples/diabetic_retinopathy/8.jpeg"  alt="DR sample" data-src="samples/diabetic_retinopathy/8.jpeg"  data-ext="jpeg" />
+        <img class="sample-thumb" src="samples/diabetic_retinopathy/9.jpeg"  alt="DR sample" data-src="samples/diabetic_retinopathy/9.jpeg"  data-ext="jpeg" />
+        <img class="sample-thumb" src="samples/diabetic_retinopathy/10.jpeg" alt="DR sample" data-src="samples/diabetic_retinopathy/10.jpeg" data-ext="jpeg" />
+      </div>
+      <!-- Glaucoma -->
+      <div class="samples-panel" data-class="glaucoma" hidden>
+        <img class="sample-thumb" src="samples/glaucoma/1.jpg"  alt="Glaucoma sample" data-src="samples/glaucoma/1.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/glaucoma/2.jpg"  alt="Glaucoma sample" data-src="samples/glaucoma/2.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/glaucoma/3.jpg"  alt="Glaucoma sample" data-src="samples/glaucoma/3.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/glaucoma/4.jpg"  alt="Glaucoma sample" data-src="samples/glaucoma/4.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/glaucoma/5.jpg"  alt="Glaucoma sample" data-src="samples/glaucoma/5.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/glaucoma/6.jpg"  alt="Glaucoma sample" data-src="samples/glaucoma/6.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/glaucoma/7.jpg"  alt="Glaucoma sample" data-src="samples/glaucoma/7.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/glaucoma/8.jpg"  alt="Glaucoma sample" data-src="samples/glaucoma/8.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/glaucoma/9.jpg"  alt="Glaucoma sample" data-src="samples/glaucoma/9.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/glaucoma/10.jpg" alt="Glaucoma sample" data-src="samples/glaucoma/10.jpg" data-ext="jpg" />
+      </div>
+      <!-- Normal -->
+      <div class="samples-panel" data-class="normal" hidden>
+        <img class="sample-thumb" src="samples/normal/1.jpg"  alt="Normal sample" data-src="samples/normal/1.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/normal/2.jpg"  alt="Normal sample" data-src="samples/normal/2.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/normal/3.jpg"  alt="Normal sample" data-src="samples/normal/3.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/normal/4.jpg"  alt="Normal sample" data-src="samples/normal/4.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/normal/5.jpg"  alt="Normal sample" data-src="samples/normal/5.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/normal/6.jpg"  alt="Normal sample" data-src="samples/normal/6.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/normal/7.jpg"  alt="Normal sample" data-src="samples/normal/7.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/normal/8.jpg"  alt="Normal sample" data-src="samples/normal/8.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/normal/9.jpg"  alt="Normal sample" data-src="samples/normal/9.jpg"  data-ext="jpg" />
+        <img class="sample-thumb" src="samples/normal/10.jpg" alt="Normal sample" data-src="samples/normal/10.jpg" data-ext="jpg" />
+      </div>
+    </div>
+  </section>
+
   <!-- ── Classifier Workspace ───────────────────────── -->
   <section class="workspace-section">
     <div class="section-header-row">
       <div>
-        <p class="section-eyebrow">02 — INFERENCE ENGINE</p>
+        <p class="section-eyebrow">03 — INFERENCE ENGINE</p>
         <h2 class="section-title">Run Classification</h2>
       </div>
     </div>
@@ -339,6 +423,10 @@
     <span class="foot-sep">·</span>
     <a href="https://github.com/SRJ-ai/ocular-ai" target="_blank" rel="noopener">GitHub</a>
   </div>
+  <div class="footer-credit">
+    Developed as an internship project under the guidance of
+    <strong>Dr. P. Rangababu</strong>, Associate Professor — IIITDM Kurnool
+  </div>
 </footer>
 
 <!-- Camera Modal -->
@@ -365,6 +453,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
-<script src="js/app.js?v=9"></script>
+<script src="js/app.js?v=10"></script>
 </body>
 </html>
