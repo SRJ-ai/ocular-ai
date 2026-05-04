@@ -540,62 +540,160 @@ async function exportPDF() {
   btn.textContent = 'Generating…';
 
   try {
-    await loadScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
     await loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');
 
-    const reportEl = document.getElementById('results-output');
-    const canvas = await html2canvas(reportEl, {
-      backgroundColor: '#131924',
-      scale: 2,
-      useCORS: true,
-      logging: false,
-    });
-
-    const imgData = canvas.toDataURL('image/png');
-    const canvasW = canvas.width;
-    const canvasH = canvas.height;
-    canvas.width  = 0;
-    canvas.height = 0;
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    const margin = 15;
-    const contentW = pageW - margin * 2;
+    const pageW   = pdf.internal.pageSize.getWidth();
+    const pageH   = pdf.internal.pageSize.getHeight();
+    const margin  = 15;
+    const cW      = pageW - margin * 2;
 
-    // Header
-    pdf.setFontSize(10);
-    pdf.setTextColor(150, 170, 190);
-    pdf.text('OcularAI — Retinal Fundus Classifier', margin, 12);
-    pdf.text('Educational use only · Not a clinical diagnosis', pageW - margin, 12, { align: 'right' });
+    // ── Background ──
+    pdf.setFillColor(19, 25, 36);
+    pdf.rect(0, 0, pageW, pageH, 'F');
+
+    let y = margin;
+
+    // ── Header ──
+    pdf.setFontSize(9);
+    pdf.setTextColor(14, 165, 233);
+    pdf.text('OCULARAI', margin, y);
+    pdf.setTextColor(148, 163, 184);
+    pdf.text('Retinal Fundus Classifier · Educational use only', pageW - margin, y, { align: 'right' });
+    y += 4;
     pdf.setDrawColor(50, 70, 90);
-    pdf.line(margin, 15, pageW - margin, 15);
+    pdf.setLineWidth(0.3);
+    pdf.line(margin, y, pageW - margin, y);
+    y += 6;
 
-    // Report image — maintain aspect ratio, scale down if needed
-    const imgAspect = canvasH / canvasW;
-    const imgH      = imgAspect * contentW;
-    const maxH      = pageH - 30;
+    // ── Report meta ──
+    const ts = resultsTimestamp.textContent;
+    pdf.setFontSize(7);
+    pdf.setTextColor(75, 95, 120);
+    pdf.text('DIAGNOSTIC REPORT', margin, y);
+    pdf.text('RID · ' + ts, pageW - margin, y, { align: 'right' });
+    y += 4;
+    pdf.text('Model: MobileNet v2  ·  Training: 4,217 images', margin, y);
+    y += 5;
+    pdf.setDrawColor(30, 45, 65);
+    pdf.line(margin, y, pageW - margin, y);
+    y += 7;
 
-    let finalW = contentW;
-    let finalH = imgH;
-    if (imgH > maxH) {
-      finalH = maxH;
-      finalW = maxH / imgAspect;
+    // ── Fundus image (left) ──
+    const thumbSize = 55;
+    try {
+      const offscreen = document.createElement('canvas');
+      offscreen.width  = 224;
+      offscreen.height = 224;
+      offscreen.getContext('2d').drawImage(previewImg, 0, 0, 224, 224);
+      const imgData = offscreen.toDataURL('image/jpeg', 0.85);
+      pdf.addImage(imgData, 'JPEG', margin, y, thumbSize, thumbSize);
+    } catch (_) {
+      pdf.setFillColor(28, 38, 56);
+      pdf.rect(margin, y, thumbSize, thumbSize, 'F');
+      pdf.setFontSize(7);
+      pdf.setTextColor(75, 95, 120);
+      pdf.text('Fundus Image', margin + thumbSize / 2, y + thumbSize / 2, { align: 'center' });
     }
 
-    pdf.addImage(imgData, 'PNG', margin, 20, finalW, finalH);
+    // ── Impression (right of image) ──
+    const rx = margin + thumbSize + 8;
+    pdf.setFontSize(7);
+    pdf.setTextColor(75, 95, 120);
+    pdf.text('IMPRESSION', rx, y + 5);
 
-    // Footer
-    pdf.setFontSize(8);
-    pdf.setTextColor(100, 120, 140);
+    pdf.setFontSize(20);
+    pdf.setTextColor(226, 232, 240);
+    pdf.text(predName.textContent, rx, y + 17);
+
+    pdf.setFontSize(16);
+    pdf.setTextColor(14, 165, 233);
+    pdf.text(predConfidence.textContent, rx, y + 28);
+    pdf.setFontSize(7);
+    pdf.setTextColor(75, 95, 120);
+    pdf.text('confidence', rx, y + 33);
+
+    y += thumbSize + 6;
+    pdf.setDrawColor(30, 45, 65);
+    pdf.line(margin, y, pageW - margin, y);
+    y += 7;
+
+    // ── Differential Diagnosis ──
+    pdf.setFontSize(7);
+    pdf.setTextColor(75, 95, 120);
+    pdf.text('DIFFERENTIAL DIAGNOSIS', margin, y);
+    y += 5;
+
+    const labelColW = 44;
+    const pctColW   = 12;
+    const barW      = cW - labelColW - pctColW - 4;
+
+    document.querySelectorAll('.conf-row').forEach((row) => {
+      const label  = row.querySelector('.conf-label')?.textContent?.trim() || '';
+      const pctTxt = row.querySelector('.conf-pct')?.textContent?.trim()   || '0%';
+      const isTop  = row.querySelector('.conf-label.top') !== null;
+      const pctVal = parseFloat(pctTxt) || 0;
+
+      pdf.setFontSize(8);
+      pdf.setTextColor(...(isTop ? [226, 232, 240] : [148, 163, 184]));
+      pdf.setFont('helvetica', isTop ? 'bold' : 'normal');
+      pdf.text(label, margin, y + 2.5);
+      pdf.setFont('helvetica', 'normal');
+
+      // Track
+      pdf.setFillColor(30, 40, 55);
+      pdf.roundedRect(margin + labelColW, y, barW, 3.5, 1, 1, 'F');
+      // Fill
+      const fillW = (pctVal / 100) * barW;
+      if (fillW > 0) {
+        pdf.setFillColor(...(isTop ? [14, 165, 233] : [75, 95, 120]));
+        pdf.roundedRect(margin + labelColW, y, fillW, 3.5, 1, 1, 'F');
+      }
+
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(...(isTop ? [14, 165, 233] : [148, 163, 184]));
+      pdf.text(pctTxt, pageW - margin, y + 2.5, { align: 'right' });
+
+      y += 8;
+    });
+
+    y += 2;
+    pdf.setDrawColor(30, 45, 65);
+    pdf.line(margin, y, pageW - margin, y);
+    y += 6;
+
+    // ── Disclaimer ──
+    pdf.setFillColor(35, 28, 8);
+    pdf.roundedRect(margin, y, cW, 14, 2, 2, 'F');
+    pdf.setDrawColor(245, 158, 11);
+    pdf.setLineWidth(0.3);
+    pdf.roundedRect(margin, y, cW, 14, 2, 2, 'S');
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(245, 158, 11);
+    pdf.text(
+      'This output is NOT a clinical diagnosis. For research and educational purposes only.',
+      margin + 3, y + 5.5,
+      { maxWidth: cW - 6 }
+    );
+    pdf.setTextColor(180, 140, 60);
+    pdf.text('Consult a qualified ophthalmologist for medical decisions.', margin + 3, y + 10.5);
+
+    // ── Footer ──
+    pdf.setDrawColor(50, 70, 90);
+    pdf.setLineWidth(0.3);
+    pdf.line(margin, pageH - 12, pageW - margin, pageH - 12);
+    pdf.setFontSize(7);
+    pdf.setTextColor(75, 95, 120);
     const now = new Date();
-    pdf.text(`Generated ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, margin, pageH - 8);
+    pdf.text(`Generated ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, margin, pageH - 7);
+    pdf.text('OcularAI · MobileNet v2 · TensorFlow.js 4.22', pageW - margin, pageH - 7, { align: 'right' });
 
-    const ts = now.getHours().toString().padStart(2,'0') +
-               now.getMinutes().toString().padStart(2,'0') +
-               now.getSeconds().toString().padStart(2,'0');
-    pdf.save(`OcularAI-Report-${ts}.pdf`);
+    const fileTs = now.getHours().toString().padStart(2,'0') +
+                   now.getMinutes().toString().padStart(2,'0') +
+                   now.getSeconds().toString().padStart(2,'0');
+    pdf.save(`OcularAI-Report-${fileTs}.pdf`);
 
   } catch (err) {
     console.error('[OcularAI] PDF export failed:', err);
