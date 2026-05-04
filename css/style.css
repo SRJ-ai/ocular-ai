@@ -1139,57 +1139,114 @@ a:hover { text-decoration: underline; }
 
 /* ─── Responsive ─────────────────────────────── */
 @media (max-width: 1100px) {
-  .conditions-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .conditions-grid { grid-template-columns: repeat(2, 1fr); }
   .workspace { grid-template-columns: 1fr 1.4fr; }
   .history-panel { grid-column: 1 / -1; }
   .history-list  { flex-direction: row; overflow-x: auto; }
 }
 
 @media (max-width: 900px) {
-  .workspace {
-    grid-template-columns: 1fr;
+  .workspace { grid-template-columns: 1fr; }
+  .report-panel { min-height: 400px; }
+  .dropzone { max-width: 100%; aspect-ratio: 4 / 3; }
+
+  .upload-panel { padding: 1.25rem; }
+  .history-panel { padding: 0.75rem 1.25rem; }
+  .history-list {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .history-list::-webkit-scrollbar { display: none; }
+  .history-card { min-width: 160px; flex-shrink: 0; }
+}
+
+@media (max-width: 768px) {
+  /* Samples: 5-column grid + scrollable category tabs */
+  .samples-panel { grid-template-columns: repeat(5, 1fr); }
+
+  .samples-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+  }
+  .samples-tabs::-webkit-scrollbar { display: none; }
+  .samples-tab { white-space: nowrap; flex-shrink: 0; }
+
+  /* Section header stacks vertically */
+  .section-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 1.75rem;
   }
 
-  .report-panel {
-    min-height: 400px;
-  }
-
-  .dropzone {
-    max-width: 100%;
-    aspect-ratio: 4 / 3;
-  }
+  /* Hero metrics: 2×2 grid, separators hidden */
+  .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .metric-sep { display: none; }
 }
 
 @media (max-width: 640px) {
-  .nav-inner { padding: 0 1.2rem; }
+  .nav-inner { padding: 0 1rem; }
   .nav-pill  { display: none; }
 
-  .hero-inner { padding: 3rem 1.2rem 2.5rem; }
-  .hero-title { font-size: 2rem; }
+  .hero-inner { padding: 3rem 1rem 2.5rem; }
+  .hero-title { font-size: 1.9rem; }
+  .hero-body  { font-size: 0.9rem; }
 
-  .hero-metrics { flex-wrap: wrap; width: 100%; }
-  .metric { padding: 0.9rem 1.2rem; }
+  .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .metric-sep { display: none; }
+  .metric { padding: 0.85rem 1rem; }
 
   .conditions,
-  .workspace-section { padding: 2.5rem 1.2rem; }
+  .samples-section,
+  .workspace-section { padding: 2.5rem 1rem; }
 
-  .conditions-grid {
-    grid-template-columns: 1fr;
-  }
+  .conditions-grid { grid-template-columns: 1fr; }
 
-  .conf-row {
-    grid-template-columns: 110px 1fr 40px;
-    gap: 0.5rem;
-  }
+  /* Fix: target .samples-panel (the actual grid), not the outer wrapper */
+  .samples-panel { grid-template-columns: repeat(5, 1fr); }
+  .credit-banner { padding: 0.6rem 1rem; }
+  .credit-banner-inner { font-size: 0.72rem; }
 
+  .conf-row { grid-template-columns: 100px 1fr 38px; gap: 0.5rem; }
   .impression { flex-direction: column; align-items: flex-start; }
 
-  .footer-inner { padding: 1.2rem; }
+  /* Report panel inner padding */
+  .rpt-head  { padding: 1rem; }
+  .rpt-block { padding: 1rem; }
+  .rpt-actions { flex-direction: column; padding: 1rem; gap: 0.5rem; }
+  .btn-export,
+  .btn-next { width: 100%; justify-content: center; }
 
-  .samples-grid { grid-template-columns: repeat(5, 1fr); }
-  .credit-banner-inner { font-size: 0.72rem; }
+  /* Report meta wraps cleanly */
+  .rpt-meta { flex-wrap: wrap; gap: 0.3rem; }
+
+  .upload-panel { padding: 1rem; }
+  .footer-inner { padding: 1rem; }
+}
+
+@media (max-width: 480px) {
+  .hero-title { font-size: 1.65rem; }
+  .section-title { font-size: 1.35rem; }
+
+  .metric { padding: 0.7rem 0.85rem; }
+  .metric-val { font-size: 1.2rem; }
+
+  /* Tighter 4-column sample grid on small phones */
+  .samples-panel { grid-template-columns: repeat(4, 1fr); }
+
+  .dropzone { aspect-ratio: 1 / 1; }
+
+  .imp-name { font-size: 1.6rem; }
+  .imp-conf { font-size: 1.3rem; }
+
+  .conf-row { grid-template-columns: 85px 1fr 34px; }
+
+  .credit-banner-inner { font-size: 0.7rem; flex-wrap: wrap; }
 }
 
 /* ─── Credit Banner ──────────────────────────────── */
