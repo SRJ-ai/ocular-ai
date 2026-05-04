@@ -552,6 +552,8 @@ async function exportPDF() {
     });
 
     const imgData = canvas.toDataURL('image/png');
+    const canvasW = canvas.width;
+    const canvasH = canvas.height;
     canvas.width  = 0;
     canvas.height = 0;
     const { jsPDF } = window.jspdf;
@@ -571,7 +573,7 @@ async function exportPDF() {
     pdf.line(margin, 15, pageW - margin, 15);
 
     // Report image — maintain aspect ratio, scale down if needed
-    const imgAspect = canvas.height / canvas.width;
+    const imgAspect = canvasH / canvasW;
     const imgH      = imgAspect * contentW;
     const maxH      = pageH - 30;
 
