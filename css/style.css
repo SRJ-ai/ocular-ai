@@ -490,6 +490,63 @@ a:hover { text-decoration: underline; }
   /* width / height / top / left set by drawHeatmap() via JS */
 }
 
+/* XAI original↔occlusion wipe slider (overlays the heatmap canvas rect) */
+.xai-slider {
+  position: absolute;
+  z-index: 3;
+  cursor: ew-resize;
+  touch-action: none;
+  user-select: none;
+  /* left / top / width / height set by drawHeatmap() via JS */
+}
+.xai-slider-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+.xai-slider-grip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(11, 18, 30, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+.xai-slider-grip svg { width: 16px; height: 16px; }
+.xai-slider:focus-visible { outline: none; }
+.xai-slider:focus-visible .xai-slider-grip {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.35);
+}
+.xai-slider-tag {
+  position: absolute;
+  top: 8px;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: rgba(7, 13, 22, 0.72);
+  color: rgba(255, 255, 255, 0.82);
+  pointer-events: none;
+}
+.xai-slider-tag--l { left: 8px; }
+.xai-slider-tag--r { right: 8px; }
+
 /* Analyzing overlay */
 #dropzone-analyzing {
   z-index: 2;

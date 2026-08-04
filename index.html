@@ -285,6 +285,18 @@
           <div id="dropzone-preview" class="dz-state" hidden>
             <img id="preview-img" alt="Uploaded fundus image" />
             <canvas id="heatmap-canvas" hidden></canvas>
+            <div id="xai-slider" class="xai-slider" hidden role="slider"
+                 aria-label="Reveal occlusion heatmap" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0">
+              <span class="xai-slider-tag xai-slider-tag--l">ORIGINAL</span>
+              <span class="xai-slider-tag xai-slider-tag--r">OCCLUSION</span>
+              <div class="xai-slider-divider" id="xai-slider-divider">
+                <span class="xai-slider-grip">
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M8 6l-3 4 3 4M12 6l3 4-3 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
           </div>
 
           <div id="dropzone-analyzing" class="dz-state dz-analyzing" hidden>

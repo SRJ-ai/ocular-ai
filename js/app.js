@@ -91,6 +91,8 @@ const xaiContent    = document.getElementById('xai-content');
 const xaiRegionList = document.getElementById('xai-region-list');
 const xaiRationale  = document.getElementById('xai-rationale');
 const heatmapCanvas = document.getElementById('heatmap-canvas');
+const xaiSlider        = document.getElementById('xai-slider');
+const xaiSliderDivider = document.getElementById('xai-slider-divider');
 
 // ─── Model loading ────────────────────────────────────────────────────────────
 
@@ -292,6 +294,7 @@ function clearImage() {
   heatmapCanvas.hidden = true;
   heatmapCanvas.width  = 0;
   heatmapCanvas.height = 0;
+  xaiSlider.hidden = true;
   // Reset XAI section
   xaiSection.hidden = true;
   xaiBody.hidden    = true;
@@ -506,6 +509,52 @@ async function loadSample(img) {
 // drawing onto the canvas of a newer image.
 let xaiRunId = 0;
 
+// Wipe-slider position: % of the image width. Left of it shows the original,
+// right of it shows the occlusion heatmap.
+let xaiWipePct = 50;
+
+// Reveal the heatmap only to the right of the wipe divider; keep the divider
+// line in sync. clipPath % is relative to the canvas border-box (== slider width).
+function applyXaiWipe() {
+  heatmapCanvas.style.clipPath = `inset(0 0 0 ${xaiWipePct}%)`;
+  xaiSliderDivider.style.left = xaiWipePct + '%';
+  xaiSlider.setAttribute('aria-valuenow', String(Math.round(xaiWipePct)));
+}
+
+function setXaiWipeFromClientX(clientX) {
+  const rect = xaiSlider.getBoundingClientRect();
+  if (!rect.width) return;
+  xaiWipePct = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+  applyXaiWipe();
+}
+
+function setupXaiSlider() {
+  let dragging = false;
+  xaiSlider.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    xaiSlider.setPointerCapture(e.pointerId);
+    setXaiWipeFromClientX(e.clientX);
+    e.preventDefault();
+  });
+  xaiSlider.addEventListener('pointermove', (e) => {
+    if (dragging) setXaiWipeFromClientX(e.clientX);
+  });
+  const end = (e) => {
+    if (!dragging) return;
+    dragging = false;
+    try { xaiSlider.releasePointerCapture(e.pointerId); } catch (_) {}
+  };
+  xaiSlider.addEventListener('pointerup', end);
+  xaiSlider.addEventListener('pointercancel', end);
+  // Keyboard: arrows nudge the divider
+  xaiSlider.addEventListener('keydown', (e) => {
+    const step = e.shiftKey ? 10 : 2;
+    if (e.key === 'ArrowLeft')  { xaiWipePct = Math.max(0, xaiWipePct - step); applyXaiWipe(); e.preventDefault(); }
+    if (e.key === 'ArrowRight') { xaiWipePct = Math.min(100, xaiWipePct + step); applyXaiWipe(); e.preventDefault(); }
+  });
+}
+setupXaiSlider();
+
 // Rendered rect of an object-fit:contain image inside its element box, so the
 // heatmap overlays the visible (letterboxed) retina, not the padded element box.
 function getContainRect(imgElement) {
@@ -568,7 +617,15 @@ function drawHeatmap(scores, imgElement) {
     ctx.fillRect(Math.round(col * pw), Math.round(row * ph), Math.ceil(pw), Math.ceil(ph));
   });
 
+  // Position the wipe slider over the exact same rect as the heatmap
+  xaiSlider.style.left   = left + 'px';
+  xaiSlider.style.top    = top + 'px';
+  xaiSlider.style.width  = w + 'px';
+  xaiSlider.style.height = h + 'px';
+  applyXaiWipe();
+
   heatmapCanvas.hidden = false;
+  xaiSlider.hidden = false;
 }
 
 function renderRegionBars(scores) {
@@ -624,6 +681,7 @@ function renderRegionBars(scores) {
 // extra full-image inference.
 async function runXAI(imgElement, topIdx, baselineConf) {
   const myRun = ++xaiRunId;
+  xaiWipePct = 50; // fresh image → centre the wipe divider
 
   xaiSection.hidden = false;
   xaiToggle.setAttribute('aria-expanded', 'true');
@@ -773,6 +831,7 @@ function restoreScan(scan) {
   xaiRunId++;
   xaiSection.hidden = true;
   heatmapCanvas.hidden = true;
+  xaiSlider.hidden = true;
 }
 
 // ─── PDF Export ───────────────────────────────────────────────────────────────
