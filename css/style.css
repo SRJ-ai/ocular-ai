@@ -484,6 +484,12 @@ a:hover { text-decoration: underline; }
   background: #070d16;
 }
 
+#heatmap-canvas {
+  position: absolute;
+  pointer-events: none;
+  /* width / height / top / left set by drawHeatmap() via JS */
+}
+
 /* Analyzing overlay */
 #dropzone-analyzing {
   z-index: 2;
@@ -1363,6 +1369,80 @@ a:hover { text-decoration: underline; }
 .sample-thumb.loading {
   opacity: 0.5;
   cursor: wait;
+}
+
+/* ─── XAI Explainability ─────────────────────────── */
+
+.xai-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  color: var(--text-dim);
+  transition: color var(--tr);
+}
+.xai-toggle:hover { color: var(--text); }
+.xai-toggle .rpt-section-label { margin: 0; pointer-events: none; }
+
+.xai-arrow {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  color: var(--text-muted);
+}
+.xai-toggle[aria-expanded="true"] .xai-arrow {
+  transform: rotate(180deg);
+}
+
+.xai-body {
+  padding: 0 1.5rem 1rem;
+}
+
+.xai-spinner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 0.25rem 0 0.5rem;
+}
+
+.xai-spin-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid var(--text-muted);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.xai-legend {
+  display: flex;
+  gap: 0.9rem;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+  flex-wrap: wrap;
+}
+.xai-legend-hot  { color: #ef4444; }
+.xai-legend-cool { color: #3b82f6; }
+
+.xai-sub-label {
+  margin-top: 0.65rem;
+  margin-bottom: 0.35rem;
+}
+
+.xai-rationale {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.55;
+  font-style: italic;
+  margin-top: 0.2rem;
 }
 
 /* ─── Footer credit ──────────────────────────────── */

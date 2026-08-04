@@ -19,6 +19,13 @@ const CLASSES = [
 
 const IMG_SIZE = 224; // Model trained with 224x224 input
 
+const XAI_RATIONALE = {
+  cataract:             'Diffuse lens opacity reduces fundus clarity — attenuated vascular contrast across the central field drives this Cataract classification.',
+  diabetic_retinopathy: 'Microaneurysms and haemorrhagic lesions concentrated in the posterior pole are the primary features driving this Diabetic Retinopathy classification.',
+  glaucoma:             'Enlarged cup-to-disc ratio and optic disc pallor, particularly in the nasal region, are the dominant indicators of Glaucoma in this scan.',
+  normal:               'Clear optic disc margins, regular vascular architecture, and absence of pathological lesions support a Normal retina classification.',
+};
+
 // ─── Lazy script loader ───────────────────────────────────────────────────────
 const _scriptCache = new Map();
 function loadScript(src) {
@@ -75,6 +82,15 @@ const confidenceBars  = document.getElementById('confidence-bars');
 const resultsTimestamp = document.getElementById('results-timestamp');
 
 const modelStatusTag  = document.getElementById('model-status-tag');
+
+const xaiSection    = document.getElementById('xai-section');
+const xaiToggle     = document.getElementById('xai-toggle');
+const xaiBody       = document.getElementById('xai-body');
+const xaiSpinner    = document.getElementById('xai-spinner');
+const xaiContent    = document.getElementById('xai-content');
+const xaiRegionList = document.getElementById('xai-region-list');
+const xaiRationale  = document.getElementById('xai-rationale');
+const heatmapCanvas = document.getElementById('heatmap-canvas');
 
 // ─── Model loading ────────────────────────────────────────────────────────────
 
@@ -208,6 +224,10 @@ function showResults(probs) {
       });
     });
   });
+
+  // Fire XAI async — report renders now, explanation fills in after. Reuses the
+  // top-class confidence as the occlusion baseline (no extra full-image predict).
+  runXAI(previewImg, topIdx, probs[topIdx]);
 }
 
 // ─── UI state management ──────────────────────────────────────────────────────
@@ -267,6 +287,17 @@ function clearImage() {
   currentFile = null;
   previewImg.src = '';
   fileInput.value = '';
+  // Cancel any in-flight XAI pass and reset the heatmap canvas
+  xaiRunId++;
+  heatmapCanvas.hidden = true;
+  heatmapCanvas.width  = 0;
+  heatmapCanvas.height = 0;
+  // Reset XAI section
+  xaiSection.hidden = true;
+  xaiBody.hidden    = true;
+  xaiToggle.setAttribute('aria-expanded', 'false');
+  xaiContent.hidden = true;
+  xaiSpinner.hidden = false;
   showState('idle');
 }
 
@@ -310,6 +341,13 @@ function captureFrame() {
     if (blob) handleFile(new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' }));
   }, 'image/jpeg', 0.92);
 }
+
+// XAI accordion expand/collapse
+xaiToggle.addEventListener('click', () => {
+  const open = xaiToggle.getAttribute('aria-expanded') === 'true';
+  xaiToggle.setAttribute('aria-expanded', String(!open));
+  xaiBody.hidden = open;
+});
 
 cameraBtn.addEventListener('click', (e) => { e.stopPropagation(); openCamera(); });
 captureBtn.addEventListener('click', captureFrame);
@@ -462,6 +500,208 @@ async function loadSample(img) {
   }
 }
 
+// ─── XAI: Explainability (occlusion sensitivity) ──────────────────────────────
+
+// Bumped on every new run so a stale in-flight XAI pass can bail out instead of
+// drawing onto the canvas of a newer image.
+let xaiRunId = 0;
+
+// Rendered rect of an object-fit:contain image inside its element box, so the
+// heatmap overlays the visible (letterboxed) retina, not the padded element box.
+function getContainRect(imgElement) {
+  const rect = imgElement.getBoundingClientRect();
+  const natW = imgElement.naturalWidth  || rect.width;
+  const natH = imgElement.naturalHeight || rect.height;
+  const scale = Math.min(rect.width / natW, rect.height / natH);
+  const dispW = natW * scale;
+  const dispH = natH * scale;
+  return {
+    elemRect: rect,
+    width:   dispW,
+    height:  dispH,
+    offsetX: (rect.width  - dispW) / 2,
+    offsetY: (rect.height - dispH) / 2,
+  };
+}
+
+function drawHeatmap(scores, imgElement) {
+  const cr = getContainRect(imgElement);
+  const parentRect = imgElement.parentElement.getBoundingClientRect();
+  const w = Math.round(cr.width);
+  const h = Math.round(cr.height);
+  const left = Math.round(cr.elemRect.left - parentRect.left + cr.offsetX);
+  const top  = Math.round(cr.elemRect.top  - parentRect.top  + cr.offsetY);
+
+  heatmapCanvas.width  = w;
+  heatmapCanvas.height = h;
+  heatmapCanvas.style.width  = w + 'px';
+  heatmapCanvas.style.height = h + 'px';
+  heatmapCanvas.style.left   = left + 'px';
+  heatmapCanvas.style.top    = top + 'px';
+
+  const ctx = heatmapCanvas.getContext('2d');
+  ctx.clearRect(0, 0, w, h);
+
+  const GRID = 8;
+  const pw = w / GRID;
+  const ph = h / GRID;
+
+  const min = Math.min(...scores);
+  const max = Math.max(...scores);
+  const range = (max - min) || 1;
+
+  scores.forEach((score, i) => {
+    const row  = Math.floor(i / GRID);
+    const col  = i % GRID;
+    const norm = (score - min) / range; // 1 = high influence (red), 0 = low (blue)
+
+    let r, g, b, a;
+    if (norm >= 0.5) {
+      r = 239; g = 68; b = 68;              // high influence
+      a = (norm - 0.5) * 2 * 0.55;
+    } else {
+      r = 59; g = 130; b = 246;             // low influence
+      a = (0.5 - norm) * 2 * 0.4;
+    }
+
+    ctx.fillStyle = `rgba(${r},${g},${b},${a.toFixed(3)})`;
+    ctx.fillRect(Math.round(col * pw), Math.round(row * ph), Math.ceil(pw), Math.ceil(ph));
+  });
+
+  heatmapCanvas.hidden = false;
+}
+
+function renderRegionBars(scores) {
+  const GRID = 8;
+  const regions = [
+    { label: 'Superior', rows: [0, 3], cols: [0, 7] },
+    { label: 'Inferior', rows: [4, 7], cols: [0, 7] },
+    { label: 'Nasal',    rows: [0, 7], cols: [0, 3] },
+    { label: 'Temporal', rows: [0, 7], cols: [4, 7] },
+  ];
+
+  const regionScores = regions.map(r => {
+    let total = 0, count = 0;
+    for (let row = r.rows[0]; row <= r.rows[1]; row++) {
+      for (let col = r.cols[0]; col <= r.cols[1]; col++) {
+        total += Math.max(0, scores[row * GRID + col]);
+        count++;
+      }
+    }
+    return { label: r.label, avg: total / count };
+  });
+
+  const maxAvg = Math.max(...regionScores.map(r => r.avg), 0.0001);
+
+  xaiRegionList.innerHTML = '';
+  regionScores.forEach(r => {
+    const pct = Math.round((r.avg / maxAvg) * 100);
+    const row = document.createElement('div');
+    row.className = 'conf-row';
+    row.innerHTML = `
+      <span class="conf-label">${r.label}</span>
+      <div class="conf-bar-track">
+        <div class="conf-bar-fill" data-width="${pct}%"></div>
+      </div>
+      <span class="conf-pct">${pct}%</span>
+    `;
+    xaiRegionList.appendChild(row);
+  });
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      xaiRegionList.querySelectorAll('.conf-bar-fill').forEach(bar => {
+        bar.style.width = bar.dataset.width;
+      });
+    });
+  });
+}
+
+// Occlusion sensitivity: black out each of 64 (8×8) patches on the 224×224 model
+// input and measure Δconfidence for the predicted class. Runs in chunked batches
+// so it is one-forward-pass-per-chunk (not 64 separate predicts) and yields to the
+// UI between chunks. `baselineConf` is reused from the original prediction — no
+// extra full-image inference.
+async function runXAI(imgElement, topIdx, baselineConf) {
+  const myRun = ++xaiRunId;
+
+  xaiSection.hidden = false;
+  xaiToggle.setAttribute('aria-expanded', 'true');
+  xaiBody.hidden    = false;
+  xaiSpinner.hidden = false;
+  xaiContent.hidden = true;
+
+  try {
+    if (!modelLoaded) throw new Error('Model not loaded');
+
+    const GRID       = 8;
+    const PATCH_PX   = IMG_SIZE / GRID;       // 28px per patch
+    const CHUNK      = 8;                      // patches per forward pass
+    const numClasses = CLASSES.length;
+    const scores     = new Array(GRID * GRID).fill(0);
+
+    // Source canvas: image squashed to the model's 224×224 geometry (matches the
+    // resizeBilinear in preprocessImage, so patch coords line up with the input).
+    const src = document.createElement('canvas');
+    src.width = IMG_SIZE;
+    src.height = IMG_SIZE;
+    src.getContext('2d').drawImage(imgElement, 0, 0, IMG_SIZE, IMG_SIZE);
+
+    for (let start = 0; start < GRID * GRID; start += CHUNK) {
+      const end = Math.min(start + CHUNK, GRID * GRID);
+
+      const batch = tf.tidy(() => {
+        const imgs = [];
+        for (let k = start; k < end; k++) {
+          const row = Math.floor(k / GRID);
+          const col = k % GRID;
+          const oc  = document.createElement('canvas');
+          oc.width  = IMG_SIZE;
+          oc.height = IMG_SIZE;
+          const ctx = oc.getContext('2d');
+          ctx.drawImage(src, 0, 0);
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(col * PATCH_PX, row * PATCH_PX, PATCH_PX, PATCH_PX);
+          // Already 224×224 → normalize [0,255] → [-1,1] to match preprocessImage
+          imgs.push(tf.browser.fromPixels(oc).toFloat().sub(127.5).div(127.5));
+        }
+        return tf.stack(imgs);                // [n, 224, 224, 3]
+      });
+
+      const out  = model.predict(batch);      // [n, numClasses]
+      const data = await out.data();
+      batch.dispose();
+      out.dispose();
+
+      // A newer image started while we were awaiting — abandon this stale pass.
+      if (myRun !== xaiRunId) return;
+
+      for (let j = 0; j < end - start; j++) {
+        // Positive = occluding this patch dropped confidence → patch mattered.
+        scores[start + j] = baselineConf - data[j * numClasses + topIdx];
+      }
+
+      await tf.nextFrame();                    // let the UI breathe between chunks
+      if (myRun !== xaiRunId) return;
+    }
+
+    drawHeatmap(scores, imgElement);
+    renderRegionBars(scores);
+    xaiRationale.textContent = XAI_RATIONALE[CLASSES[topIdx].key] || '';
+
+    xaiSpinner.hidden = true;
+    xaiContent.hidden = false;
+
+  } catch (err) {
+    console.error('[OcularAI] XAI error:', err);
+    if (myRun !== xaiRunId) return;
+    xaiSpinner.hidden = true;
+    xaiContent.hidden = false;
+    xaiRegionList.innerHTML = '';
+    xaiRationale.textContent = 'Explanation unavailable.';
+  }
+}
+
 // ─── Scan History ─────────────────────────────────────────────────────────────
 
 const HISTORY_KEY = 'ocularai_history';
@@ -529,6 +769,10 @@ function restoreScan(scan) {
   resultsError.hidden    = true;
   resultsPanel.style.alignItems = 'flex-start';
   confidenceBars.innerHTML = '<p style="color:var(--text-muted);font-size:0.75rem;padding:0.5rem 0">Restored from history</p>';
+  // XAI is not recomputed for history restores — cancel any in-flight pass and hide it
+  xaiRunId++;
+  xaiSection.hidden = true;
+  heatmapCanvas.hidden = true;
 }
 
 // ─── PDF Export ───────────────────────────────────────────────────────────────
