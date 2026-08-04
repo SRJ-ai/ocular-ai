@@ -1272,8 +1272,6 @@ a:hover { text-decoration: underline; }
 
   /* Fix: target .samples-panel (the actual grid), not the outer wrapper */
   .samples-panel { grid-template-columns: repeat(5, 1fr); }
-  .credit-banner { padding: 0.6rem 1rem; }
-  .credit-banner-inner { font-size: 0.72rem; }
 
   .conf-row { grid-template-columns: 100px 1fr 38px; gap: 0.5rem; }
   .impression { flex-direction: column; align-items: flex-start; }
@@ -1308,55 +1306,7 @@ a:hover { text-decoration: underline; }
   .imp-conf { font-size: 1.3rem; }
 
   .conf-row { grid-template-columns: 85px 1fr 34px; }
-
-  .credit-banner-inner { font-size: 0.7rem; flex-wrap: wrap; }
 }
-
-/* ─── Credit Banner ──────────────────────────────── */
-.credit-banner {
-  background: rgba(245,158,11,0.1);
-  border-bottom: 1px solid rgba(245,158,11,0.25);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.6rem 2rem;
-  gap: 1rem;
-}
-
-.credit-banner-inner {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 0.78rem;
-  color: var(--amber);
-  flex: 1;
-  line-height: 1.5;
-}
-.credit-banner-inner svg {
-  width: 15px;
-  height: 15px;
-  flex-shrink: 0;
-  opacity: 0.85;
-}
-.credit-banner-inner strong { color: #fcd34d; }
-
-.credit-banner-close {
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 5px;
-  color: var(--amber);
-  opacity: 0.7;
-  transition: var(--tr);
-  flex-shrink: 0;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-.credit-banner-close svg { width: 10px; height: 10px; }
-.credit-banner-close:hover { opacity: 1; background: rgba(245,158,11,0.15); }
 
 /* ─── Sample Gallery ─────────────────────────────── */
 .samples-section {
@@ -1502,13 +1452,3 @@ a:hover { text-decoration: underline; }
   margin-top: 0.2rem;
 }
 
-/* ─── Footer credit ──────────────────────────────── */
-.footer-credit {
-  text-align: center;
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  border-top: 1px solid var(--border);
-  padding: 0.75rem 2rem;
-  line-height: 1.6;
-}
-.footer-credit strong { color: var(--text-dim); }

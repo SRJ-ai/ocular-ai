@@ -445,25 +445,8 @@ document.addEventListener('DOMContentLoaded', () => {
   renderHistory();
   startImageCycling();
   loadModel();
-  initCreditBanner();
   initSampleGallery();
 });
-
-// ─── Credit Banner ────────────────────────────────────────────────────────────
-
-function initCreditBanner() {
-  const banner = document.getElementById('credit-banner');
-  const closeBtn = document.getElementById('credit-banner-close');
-  if (!banner || !closeBtn) return;
-  if (sessionStorage.getItem('banner_dismissed')) {
-    banner.hidden = true;
-    return;
-  }
-  closeBtn.addEventListener('click', () => {
-    banner.hidden = true;
-    sessionStorage.setItem('banner_dismissed', '1');
-  });
-}
 
 // ─── Sample Gallery ───────────────────────────────────────────────────────────
 
